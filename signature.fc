@@ -1,0 +1,36 @@
+;; Signature Verification for OpUSD Smart Contract
+
+;; Check Elite Group or DAO Signature
+(int) check_elite_or_dao_signature(int signature, int proposer) impure {
+    var data = get_data();
+    cell elite_group = data~load_ref();
+    slice elite = elite_group.begin_parse();
+    int is_elite = 0;
+    while (elite.slice_bits() >= 256) {
+        if (elite~load_uint(256) == proposer) {
+            is_elite = 1;
+            break;
+        }
+    }
+    return is_elite && check_single_signature(signature, proposer)
+           || check_dao_signature(signature);
+}
+
+;; DAO Signature (5 Wallets, Need 3)
+(int) check_dao_signature(int signature) impure {
+    int required_sigs = 3;
+    int valid_sigs = 0;
+    repeat(5) {
+        if (check_single_signature(signature, it)) {
+            valid_sigs += 1;
+        }
+    }
+    return valid_sigs >= required_sigs;
+}
+
+;; Update Elite Group Monthly
+() update_elite_group(cell new_elite) impure {
+    var data = get_data();
+    data = data.store_ref(new_elite);
+    set_data(data);
+}
