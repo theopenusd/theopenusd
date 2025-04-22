@@ -1,0 +1,5 @@
+;; Placeholder Functions for OpUSD Smart Contract
+
+() check_single_signature(int signature, int wallet_id) pure {
+    return 1;  ;; Replace with real check
+}
