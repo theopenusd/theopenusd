@@ -1,0 +1,21 @@
+;; Initialization for OpUSD Smart Contract
+
+() init() impure {
+    set_data(begin_cell()
+        .store_uint(0, 1)    ;; emergency_pause
+        .store_uint(100, 32) ;; flex_k
+        .store_uint(100000000, 64) ;; total_supply (100M OpUSD)
+        .store_uint(0, 64)   ;; ton_reserve
+        .store_uint(0, 64)   ;; opshare_reserve
+        .store_uint(0, 64)   ;; btc_reserve
+        .store_uint(0, 64)   ;; eth_reserve
+        .store_uint(0, 64)   ;; extra_ton
+        .store_uint(0, 64)   ;; extra_ton_plus
+        .store_uint(0, 32)   ;; phase
+        .store_uint(0, 32)   ;; oracle_price
+        .store_uint(0, 64)   ;; last_update_time
+        .store_uint(0, 32)   ;; ton_30d_avg
+        .store_uint(0, 32)   ;; opshare_30d_avg
+        .store_ref(begin_cell().end_cell()) ;; elite_group
+        .end_cell());
+}
