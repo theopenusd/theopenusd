@@ -1,0 +1,59 @@
+;; OpUSD Smart Contract (Public Version)
+;; Supports Elite Group (10000 OpUSD + 2000 OpShare) and DAO
+;; Compatible with Whitepaper v2.16
+;; Date: April 16, 2025
+
+() recv_internal(int msg_value, cell in_msg, slice in_msg_body) impure {
+    throw_if(100, in_msg_body.slice_empty?());
+    int operation = in_msg_body~load_uint(32);
+
+    if (operation == 1) {  ;; Mint OpUSD (Elite Group or DAO)
+        var (amount, signature, proposer) = parse_mint_message(in_msg_body);
+        throw_if(101, amount <= 0 || amount > 50000000);
+        throw_if(102, ~check_elite_or_dao_signature(signature, proposer));
+        mint_opusd(amount);
+    }
+
+    if (operation == 2) {  ;; Burn OpUSD (Users or DAO)
+        var (amount, signature) = parse_burn_message(in_msg_body);
+        throw_if(103, amount <= 0 || amount > 50000000);
+        if (signature != 0) { throw_if(104, ~check_dao_signature(signature)); }
+        burn_opusd(amount);
+    }
+
+    if (operation == 3) {  ;; Update Flex k (DAO)
+        var (new_k, signature) = parse_flex_k_message(in_msg_body);
+        throw_if(105, ~check_dao_signature(signature));
+        update_flex_k(new_k);
+    }
+
+    if (operation == 4) {  ;; Emergency Pause (DAO)
+        var (pause_flag, signature) = parse_pause_message(in_msg_body);
+        throw_if(106, ~check_dao_signature(signature));
+        set_emergency_pause(pause_flag);
+    }
+
+    if (operation == 5) {  ;; Distribute Reserves (DAO)
+        var (signature) = parse_distribute_message(in_msg_body);
+        throw_if(107, ~check_dao_signature(signature));
+        distribute_reserves();
+    }
+
+    if (operation == 6) {  ;; Oracle Update (DAO)
+        var (oracle_msg, signature) = parse_oracle_message(in_msg_body);
+        throw_if(108, ~check_dao_signature(signature));
+        recv_oracle_price(oracle_msg);
+    }
+
+    if (operation == 7) {  ;; Rebalance Reserves (DAO)
+        var (signature) = parse_rebalance_message(in_msg_body);
+        throw_if(109, ~check_dao_signature(signature));
+        rebalance_reserves();
+    }
+
+    if (operation == 8) {  ;; Update Elite Group (DAO)
+        var (new_elite, signature) = parse_elite_update_message(in_msg_body);
+        throw_if(110, ~check_dao_signature(signature));
+        update_elite_group(new_elite);
+    }
+}
