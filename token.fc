@@ -1,0 +1,16 @@
+;; Token Functions for OpUSD Smart Contract
+
+() mint_opusd(int amount) impure {
+    var data = get_data();
+    int total_supply = data~load_uint(64);
+    total_supply += amount;
+    set_data(data.store_uint(total_supply, 64));
+}
+
+() burn_opusd(int amount) impure {
+    var data = get_data();
+    int total_supply = data~load_uint(64);
+    throw_if(112, total_supply < amount);
+    total_supply -= amount;
+    set_data(data.store_uint(total_supply, 64));
+}
